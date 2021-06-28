@@ -24,4 +24,4 @@ function distance(x1, y1, x2, y2) {
 const canvas = document.createElement("canvas");
 canvas.setAttribute("width", scwidth);
 canvas.setAttribute("height", scheight);
-document.getElementByID("wrap").appendChild(canvas);
+document.getElementById("wrap").appendChild(canvas);
