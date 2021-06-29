@@ -46,6 +46,21 @@ class Player {
     this.x += Math.cos(this.angle) * this.speed;
     this.y += Math.sin(this.angle) * this.speed;
   }
+
+  show(posx, posy, scale) {
+    ctx.fillStyle = 'blue';
+    ctx.fillRect(posx + this.x * scale - 10/2, posy + this.y * scale - 10/2, 10, 10);
+  
+    ctx.strokeStyle = 'blue';
+    ctx.beginPath();
+    ctx.moveTo(this.x * scale, this.y * scale);
+    ctx.lineTo(
+      (this.x + Math.cos(this.angle) * 20) * scale, 
+      (this.y + Math.sin(this.angle) * 20) * scale
+    );
+    ctx.closePath();
+    ctx.stroke();
+  }
 }
 
 const player = new Player();
@@ -65,18 +80,7 @@ function renderMinimap(posx, posy, scale=0.75) {
 		})
 	});
 
-  ctx.fillStyle = 'blue';
-  ctx.fillRect(posx + player.x * scale - 10/2, posy + player.y * scale - 10/2, 10, 10);
-  
-  ctx.strokeStyle = 'blue';
-  ctx.beginPath();
-  ctx.moveTo(player.x * scale, player.y * scale);
-  ctx.lineTo(
-    (player.x + Math.cos(player.angle) * 20) * scale, 
-    (player.y + Math.sin(player.angle) * 20) * scale
-  );
-  ctx.closePath();
-  ctx.stroke();
+  player.show(posx, posy, scale);
 
 }
 
