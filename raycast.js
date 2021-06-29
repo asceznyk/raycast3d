@@ -41,9 +41,19 @@ class Player {
     this.angle = 0;
     this.speed = 0;
   }
+
+  move () {
+    this.x += Math.cos(this.angle) * this.speed;
+    this.y += Math.sin(this.angle) * this.speed;
+  }
 }
 
 const player = new Player();
+
+function clearScreen() {
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, scwidth, scheight);
+}
 
 function renderMinimap(posx, posy, scale=0.75) {
   let csize = cellsize * scale;
@@ -57,15 +67,45 @@ function renderMinimap(posx, posy, scale=0.75) {
 
   ctx.fillStyle = 'blue';
   ctx.fillRect(posx + player.x * scale - 10/2, posy + player.y * scale - 10/2, 10, 10);
+  
+  ctx.strokeStyle = 'blue';
+  ctx.beginPath();
+  ctx.moveTo(player.x * scale, player.y * scale);
+  ctx.lineTo(
+    (player.x + Math.cos(player.angle) * 20) * scale, 
+    (player.y + Math.sin(player.angle) * 20) * scale
+  );
+  ctx.closePath();
+  ctx.stroke();
+
 }
 
 function gameLoop() {
-	renderMinimap(0, 0);
+  clearScreen();
+  player.move();
+  renderMinimap(0, 0);
 }
 
 setInterval(gameLoop, tick);
 
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowUp") {
+    player.speed = 2;
+  }
+  if (e.key === "ArrowDown") {
+    player.speed = -2;
+  }
+});
 
+document.addEventListener("keyup", (e) => {
+  if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+    player.speed = 0;
+  }
+});
+
+document.addEventListener("mousemove", function (event) {
+  player.angle += toRadians(event.movementX);
+});
 
 
 
