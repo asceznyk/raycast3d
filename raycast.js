@@ -8,6 +8,10 @@ function distance(x1, y1, x2, y2) {
   return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 
+function outofMap(x, y) {
+  return x < 0 || x >= map[0].length || y < 0 || y >= map.length;
+}
+
 const map = [
   [1, 1, 1, 1, 1, 1, 1, 1],
   [1, 0, 0, 0, 0, 0, 0, 1],
@@ -27,12 +31,22 @@ const scheight = window.innerHeight;
 
 const cellsize = 32;
 
+const fov = toRadians(60);
+
 const canvas = document.createElement("canvas");
 canvas.setAttribute("width", scwidth);
 canvas.setAttribute("height", scheight);
 document.getElementById("wrap").appendChild(canvas);
 
 const ctx = canvas.getContext('2d');
+
+const colors = {
+  floor: "#d52b1e", // "#ff6361"
+  ceiling: "#ffa975", //"#ffffff", // "#012975",
+  darkwall: "#013aa6", // "#58508d"
+  lightwall: "#012975", // "#003f5c"
+  rays: "#ffa600"
+}
 
 class Player {
   constructor() {
