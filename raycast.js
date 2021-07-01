@@ -80,7 +80,7 @@ class Player {
 const player = new Player();
 
 function clearScreen() {
-  ctx.fillStyle = '#fff';
+  ctx.fillStyle = 'red';
   ctx.fillRect(0, 0, scwidth, scheight);
 }
 
