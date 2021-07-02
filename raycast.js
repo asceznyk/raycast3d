@@ -12,46 +12,10 @@ function outofMap(x, y) {
   return x < 0 || x >= map[0].length || y < 0 || y >= map.length;
 }
 
-const map = [
-  [1, 1, 1, 1, 1, 1, 1, 1],
-  [1, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 1, 1, 0, 1, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 1, 0, 1, 0, 0, 1],
-  [1, 0, 1, 0, 1, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 1],
-  [1, 1, 1, 1, 1, 1, 1, 1],
-];
-
-
-const tick = 30;
-
-const scwidth = window.innerWidth;
-const scheight = window.innerHeight;
-
-const cellsize = 32;
-
-const fov = toRadians(60);
-
-const canvas = document.createElement("canvas");
-canvas.setAttribute("width", scwidth);
-canvas.setAttribute("height", scheight);
-document.getElementById("wrap").appendChild(canvas);
-
-const ctx = canvas.getContext('2d');
-
-const colors = {
-  floor: "#d52b1e", // "#ff6361"
-  ceiling: "#ffa975", //"#ffffff", // "#012975",
-  darkwall: "#013aa6", // "#58508d"
-  lightwall: "#012975", // "#003f5c"
-  rays: "#ffa600"
-}
-
 class Player {
   constructor() {
-    this.x = cellsize * 1.5;
-    this.y = cellsize * 2;
+    this.x = cellsize/2; //cellsize * 1.5;
+    this.y = cellsize/2; //cellsize * 2;
     this.angle = 0;
     this.speed = 0;
   }
@@ -77,11 +41,127 @@ class Player {
   }
 }
 
+/*const map = [
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 1, 1, 0, 1, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 1, 0, 1, 0, 0, 1],
+  [1, 0, 1, 0, 1, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+];*/
+
+const map = [[0,0], [0,1]];
+
+const tick = 30;
+
+const scwidth = window.innerWidth;
+const scheight = window.innerHeight;
+
+const cellsize = 32;
+
+const fov = toRadians(60);
+
+const canvas = document.createElement("canvas");
+canvas.setAttribute("width", scwidth);
+canvas.setAttribute("height", scheight);
+document.getElementById("wrap").appendChild(canvas);
+
+const ctx = canvas.getContext('2d');
+
+const colors = {
+  floor: "#d52b1e", // "#ff6361"
+  ceiling: "#ffa975", //"#ffffff", // "#012975",
+  darkwall: "#013aa6", // "#58508d"
+  lightwall: "#012975", // "#003f5c"
+  rays: "#ffa600"
+}
+
 const player = new Player();
 
 function clearScreen() {
   ctx.fillStyle = 'red';
   ctx.fillRect(0, 0, scwidth, scheight);
+}
+
+function getHCollision(angle) {
+  let up = Math.abs(Math.floor(angle / Math.PI) % 2);
+
+  let ynearest = up
+    ? Math.floor(player.y / cellsize) * cellsize + cellsize 
+    : Math.floor(player.y / cellsize) * cellsize;
+
+  let xnearest = player.x + Math.tan(angle) * (ynearest - player.y);
+
+  let dy = up ? -cellsize: cellsize;
+  let dx = dy / Math.tan(angle);
+
+  let [nextx, nexty] = [xnearest, ynearest];
+
+  let wall = 0;
+
+  while(!wall) {
+    let celly = up ? Math.floor(nexty / cellsize) - 1 : Math.floor(nexty / cellsize);
+    let cellx = Math.floor(nextx / cellsize);
+
+    if(outofMap(cellx, celly)) {
+      break;
+    }
+
+    wall = map[celly][cellx];
+    
+    if(!wall) {
+      nextx += dx; 
+      nexty += dy;
+    }
+  }
+
+  return {
+    vertical:false,
+    distance: distance(player.x, player.y, nextx, nexty),
+    angle,
+  };
+}
+
+
+function getVCollision(angle) {
+  let right = Math.abs(Math.floor((angle - Math.PI/2) / Math.PI) % 2);
+
+  let xnearest = right 
+    ? Math.floor(player.x / cellsize) * cellsize + cellsize 
+    : Math.floor(player.x / cellsize) * cellsize;
+
+  let ynearest = player.y + Math.tan(angle) * (xnearest - player.x);
+
+  let dx = right ? cellsize: -cellsize;
+  let dy = Math.tan(angle) * dx;
+
+  let [nextx, nexty] = [xnearest, ynearest];
+
+  let wall = 0;
+
+  while(!wall) {
+    let cellx = right ? Math.floor(nextx / cellsize) : Math.floor(nextx / cellsize) - 1;
+    let celly = Math.floor(nexty / cellsize);
+
+    if(outofMap(cellx, celly)) {
+      break;
+    }
+
+    wall = map[celly][cellx];
+    
+    if(!wall) {
+      nextx += dx; 
+      nexty += dy;
+    }
+  }
+
+  return {
+    vertical:true,
+    distance: distance(player.x, player.y, nextx, nexty),
+    angle,
+  };
 }
 
 function renderMinimap(posx, posy, scale=0.75) {
