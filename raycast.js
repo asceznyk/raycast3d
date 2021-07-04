@@ -18,6 +18,7 @@ class Player {
     this.y = cellsize * 2;
     this.angle = 0;
     this.speed = 0;
+    this.color = '#3D5A80';
   }
 
   move () {
@@ -26,10 +27,10 @@ class Player {
   }
 
   show(posx, posy, scale) {
-    ctx.fillStyle = 'blue';
+    ctx.fillStyle = this.color;
     ctx.fillRect(posx + this.x * scale - 10/2, posy + this.y * scale - 10/2, 10, 10);
   
-    ctx.strokeStyle = 'blue';
+    ctx.strokeStyle = this.color;
     ctx.beginPath();
     ctx.moveTo(this.x * scale, this.y * scale);
     ctx.lineTo(
@@ -69,11 +70,11 @@ document.getElementById("wrap").appendChild(canvas);
 const ctx = canvas.getContext('2d');
 
 const colors = {
-  floor: "#d52b1e", // "#ff6361"
-  ceiling: "#ffa975", //"#ffffff", // "#012975",
-  darkwall: "#013aa6", // "#58508d"
-  lightwall: "#012975", // "#003f5c"
-  rays: "#ffa600"
+  floor: "#8C4F47", // "#ff6361"
+  ceiling: "#EE6C4D", //"#ffffff", // "#012975",
+  darkwall: "#98C1D9", // "#58508d"
+  lightwall: "#BCDEEB", // "#003f5c"
+  rays: "#EE6C4D",
 }
 
 const player = new Player();
@@ -183,7 +184,7 @@ function renderMinimap(posx, posy, rays, scale=0.75) {
 
 	map.forEach((row, y) => {
 		row.forEach((cell, x) => {
-			ctx.fillStyle = cell ? '#999' : '#000'; 
+			ctx.fillStyle = cell ? colors.lightwall : colors.floor; 
 			ctx.fillRect(posx+(x*csize), posy+(y*csize), csize, csize);
 		})
 	});
