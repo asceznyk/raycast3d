@@ -52,8 +52,6 @@ const map = [
   [1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
-/*const map = [[0,0], [0,1]];*/
-
 const tick = 30;
 
 const scwidth = window.innerWidth;
@@ -210,12 +208,20 @@ function fixFishEye(distance, rangle, pangle) {
   return distance * Math.cos(rangle - pangle);
 }
 
-//function renderScene(rays) {}
+function renderScene(rays) {
+  rays.forEach((ray, r) => {
+    let distance = fixFishEye(ray.distance, ray.angle, player.angle);
+    let wallheight = ((cellsize) / distance) * 250;
+    ctx.fillStyle = ray.vertical ? colors.lightwall : colors.darkwall;
+    ctx.fillRect(r, (scheight - wallheight)/2, 1, wallheight);
+  });
+}
 
 function gameLoop() {
   clearScreen();
   let rays = getRays();
   player.move();
+  renderScene(rays);
   renderMinimap(0, 0, rays);
 }
 
