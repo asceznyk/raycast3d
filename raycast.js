@@ -14,8 +14,8 @@ function outofMap(x, y) {
 
 class Player {
   constructor() {
-    this.x = cellsize/2; //cellsize * 1.5;
-    this.y = cellsize/2; //cellsize * 2;
+    this.x = cellsize * 1.5;
+    this.y = cellsize * 2;
     this.angle = 0;
     this.speed = 0;
   }
@@ -41,7 +41,7 @@ class Player {
   }
 }
 
-/*const map = [
+const map = [
   [1, 1, 1, 1, 1, 1, 1, 1],
   [1, 0, 0, 0, 0, 0, 0, 1],
   [1, 0, 1, 1, 0, 1, 0, 1],
@@ -50,9 +50,9 @@ class Player {
   [1, 0, 1, 0, 1, 0, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 1],
   [1, 1, 1, 1, 1, 1, 1, 1],
-];*/
+];
 
-const map = [[0,0], [0,1]];
+/*const map = [[0,0], [0,1]];*/
 
 const tick = 30;
 
@@ -89,17 +89,17 @@ function getHCollision(angle) {
   let up = Math.abs(Math.floor(angle / Math.PI) % 2);
 
   let ynearest = up
-    ? Math.floor(player.y / cellsize) * cellsize + cellsize 
-    : Math.floor(player.y / cellsize) * cellsize;
+    ? Math.floor(player.y / cellsize) * cellsize 
+    : Math.floor(player.y / cellsize) * cellsize + cellsize;
 
-  let xnearest = player.x + Math.tan(angle) * (ynearest - player.y);
+  let xnearest = player.x + (ynearest - player.y) / Math.tan(angle);
 
   let dy = up ? -cellsize: cellsize;
   let dx = dy / Math.tan(angle);
 
   let [nextx, nexty] = [xnearest, ynearest];
 
-  let wall = 0;
+  let wall;
 
   while(!wall) {
     let celly = up ? Math.floor(nexty / cellsize) - 1 : Math.floor(nexty / cellsize);
@@ -124,7 +124,6 @@ function getHCollision(angle) {
   };
 }
 
-
 function getVCollision(angle) {
   let right = Math.abs(Math.floor((angle - Math.PI/2) / Math.PI) % 2);
 
@@ -139,7 +138,7 @@ function getVCollision(angle) {
 
   let [nextx, nexty] = [xnearest, ynearest];
 
-  let wall = 0;
+  let wall;
 
   while(!wall) {
     let cellx = right ? Math.floor(nextx / cellsize) : Math.floor(nextx / cellsize) - 1;
@@ -164,7 +163,24 @@ function getVCollision(angle) {
   };
 }
 
-function renderMinimap(posx, posy, scale=0.75) {
+function castRay(angle) {
+  let vcollide = getVCollision(angle);
+  let hcollide = getHCollision(angle);
+
+  return hcollide.distance >= vcollide.distance ? vcollide : hcollide;
+}
+
+function getRays() {
+  let initangle = player.angle - fov/2;
+  let numrays = scwidth;
+  let anglestep = fov / numrays;
+
+  return Array.from({length : numrays}, (_, i) => {
+    return castRay(initangle + i * anglestep);
+  });
+} 
+
+function renderMinimap(posx, posy, rays, scale=0.75) {
   let csize = cellsize * scale;
 
 	map.forEach((row, y) => {
@@ -175,13 +191,25 @@ function renderMinimap(posx, posy, scale=0.75) {
 	});
 
   player.show(posx, posy, scale);
-
+  
+  ctx.strokeStyle = colors.rays;
+  rays.forEach((ray, r) => { 
+    ctx.beginPath();
+    ctx.moveTo(player.x * scale, player.y * scale);
+    ctx.lineTo(
+      (player.x + Math.cos(ray.angle) * ray.distance) * scale, 
+      (player.y + Math.sin(ray.angle) * ray.distance) * scale
+    );
+    ctx.closePath();
+    ctx.stroke();
+  });
 }
 
 function gameLoop() {
   clearScreen();
+  let rays = getRays();
   player.move();
-  renderMinimap(0, 0);
+  renderMinimap(0, 0, rays);
 }
 
 setInterval(gameLoop, tick);
