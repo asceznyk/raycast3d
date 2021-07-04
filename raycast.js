@@ -211,9 +211,19 @@ function fixFishEye(distance, rangle, pangle) {
 function renderScene(rays) {
   rays.forEach((ray, r) => {
     let distance = fixFishEye(ray.distance, ray.angle, player.angle);
-    let wallheight = ((cellsize) / distance) * 250;
+    let wallheight = ((cellsize * 3) / distance) * 250;
     ctx.fillStyle = ray.vertical ? colors.lightwall : colors.darkwall;
     ctx.fillRect(r, (scheight - wallheight)/2, 1, wallheight);
+    
+    ctx.fillStyle = colors.floor;
+    ctx.fillRect(r, 
+      (scheight - wallheight)/2 + wallheight, 
+      1, 
+      scheight - ((scheight - wallheight)/2 + wallheight)
+    );
+
+    ctx.fillStyle = colors.ceiling;
+    ctx.fillRect(r, 0, 1, (scheight - wallheight)/2);
   });
 }
 
