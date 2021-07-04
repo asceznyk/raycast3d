@@ -205,6 +205,13 @@ function renderMinimap(posx, posy, rays, scale=0.75) {
   });
 }
 
+
+function fixFishEye(distance, rangle, pangle) {
+  return distance * Math.cos(rangle - pangle);
+}
+
+//function renderScene(rays) {}
+
 function gameLoop() {
   clearScreen();
   let rays = getRays();
@@ -213,6 +220,10 @@ function gameLoop() {
 }
 
 setInterval(gameLoop, tick);
+
+canvas.addEventListener("click", () => {
+  canvas.requestPointerLock();
+});
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "ArrowUp") {
