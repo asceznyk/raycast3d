@@ -1,5 +1,3 @@
-//first some utility functions
-
 function toRadians(deg) {
   return (deg * Math.PI) / 180;
 }
@@ -70,10 +68,10 @@ document.getElementById("wrap").appendChild(canvas);
 const ctx = canvas.getContext('2d');
 
 const colors = {
-  floor: "#8C4F47", // "#ff6361"
-  ceiling: "#EE6C4D", //"#ffffff", // "#012975",
-  darkwall: "#98C1D9", // "#58508d"
-  lightwall: "#BCDEEB", // "#003f5c"
+  floor: "#8C4F47",   
+  ceiling: "#EE6C4D", 
+  darkwall: "#98C1D9", 
+  lightwall: "#BCDEEB",
   rays: "#EE6C4D",
 }
 
@@ -261,20 +259,5 @@ document.addEventListener("keyup", (e) => {
 document.addEventListener("mousemove", function (event) {
   player.angle += toRadians(event.movementX);
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
