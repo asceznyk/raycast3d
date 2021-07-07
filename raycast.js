@@ -82,6 +82,16 @@ function clearScreen() {
   ctx.fillRect(0, 0, scwidth, scheight);
 }
 
+function collisionWithWall() {
+  let cx = Math.floor(player.x / cellsize);
+  let cy = Math.floor(player.y / cellsize);
+
+  if (map[cx][cy] > 0) {
+    player.x -= Math.cos(player.angle) * player.speed;
+    player.y -= Math.sin(player.angle) * player.speed;
+  }
+}
+
 function getHCollision(angle) {
   let up = Math.abs(Math.floor(angle / Math.PI) % 2);
 
@@ -231,6 +241,7 @@ function gameLoop() {
   clearScreen();
   let rays = getRays();
   player.move();
+  collisionWithWall();
   renderScene(rays);
   renderMinimap(0, 0, rays);
 }
