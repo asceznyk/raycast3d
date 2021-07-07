@@ -86,7 +86,7 @@ function collisionWithWall() {
   let cx = Math.floor(player.x / cellsize);
   let cy = Math.floor(player.y / cellsize);
 
-  if (map[cx][cy] > 0) {
+  if (map[cy][cx] > 0) { 
     player.x -= Math.cos(player.angle) * player.speed;
     player.y -= Math.sin(player.angle) * player.speed;
   }
