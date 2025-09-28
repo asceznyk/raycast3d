@@ -18,16 +18,17 @@ class Player {
     this.speed = 0;
     this.color = '#3D5A80';
   }
-
   move () {
     this.x += Math.cos(this.angle) * this.speed;
     this.y += Math.sin(this.angle) * this.speed;
   }
-
   show(posx, posy, scale) {
     ctx.fillStyle = this.color;
-    ctx.fillRect(posx + this.x * scale - 10/2, posy + this.y * scale - 10/2, 10, 10);
-  
+    ctx.fillRect(
+      posx + this.x * scale - 10/2,
+      posy + this.y * scale - 10/2,
+      10, 10
+    ); 
     ctx.strokeStyle = this.color;
     ctx.beginPath();
     ctx.moveTo(this.x * scale, this.y * scale);
@@ -85,7 +86,6 @@ function clearScreen() {
 function collisionWithWall() {
   let cx = Math.floor(player.x / cellsize);
   let cy = Math.floor(player.y / cellsize);
-
   if (map[cy][cx] > 0) { 
     player.x -= Math.cos(player.angle) * player.speed;
     player.y -= Math.sin(player.angle) * player.speed;
@@ -94,36 +94,28 @@ function collisionWithWall() {
 
 function getHCollision(angle) {
   let up = Math.abs(Math.floor(angle / Math.PI) % 2);
-
   let ynearest = up
     ? Math.floor(player.y / cellsize) * cellsize 
     : Math.floor(player.y / cellsize) * cellsize + cellsize;
-
   let xnearest = player.x + (ynearest - player.y) / Math.tan(angle);
-
   let dy = up ? -cellsize: cellsize;
   let dx = dy / Math.tan(angle);
-
   let [nextx, nexty] = [xnearest, ynearest];
-
   let wall;
-
   while(!wall) {
-    let celly = up ? Math.floor(nexty / cellsize) - 1 : Math.floor(nexty / cellsize);
+    let celly = up 
+      ? Math.floor(nexty / cellsize) - 1 
+      : Math.floor(nexty / cellsize);
     let cellx = Math.floor(nextx / cellsize);
-
     if(outofMap(cellx, celly)) {
       break;
     }
-
-    wall = map[celly][cellx];
-    
+    wall = map[celly][cellx]; 
     if(!wall) {
       nextx += dx; 
       nexty += dy;
     }
   }
-
   return {
     vertical:false,
     distance: distance(player.x, player.y, nextx, nexty),
@@ -133,36 +125,28 @@ function getHCollision(angle) {
 
 function getVCollision(angle) {
   let right = Math.abs(Math.floor((angle - Math.PI/2) / Math.PI) % 2);
-
   let xnearest = right 
     ? Math.floor(player.x / cellsize) * cellsize + cellsize 
     : Math.floor(player.x / cellsize) * cellsize;
-
   let ynearest = player.y + Math.tan(angle) * (xnearest - player.x);
-
   let dx = right ? cellsize: -cellsize;
   let dy = Math.tan(angle) * dx;
-
   let [nextx, nexty] = [xnearest, ynearest];
-
   let wall;
-
   while(!wall) {
-    let cellx = right ? Math.floor(nextx / cellsize) : Math.floor(nextx / cellsize) - 1;
+    let cellx = right
+      ? Math.floor(nextx / cellsize)
+      : Math.floor(nextx / cellsize) - 1;
     let celly = Math.floor(nexty / cellsize);
-
     if(outofMap(cellx, celly)) {
       break;
     }
-
-    wall = map[celly][cellx];
-    
+    wall = map[celly][cellx]; 
     if(!wall) {
       nextx += dx; 
       nexty += dy;
     }
   }
-
   return {
     vertical:true,
     distance: distance(player.x, player.y, nextx, nexty),
@@ -173,7 +157,6 @@ function getVCollision(angle) {
 function castRay(angle) {
   let vcollide = getVCollision(angle);
   let hcollide = getHCollision(angle);
-
   return hcollide.distance >= vcollide.distance ? vcollide : hcollide;
 }
 
@@ -181,7 +164,6 @@ function getRays() {
   let initangle = player.angle - fov/2;
   let numrays = scwidth;
   let anglestep = fov / numrays;
-
   return Array.from({length : numrays}, (_, i) => {
     return castRay(initangle + i * anglestep);
   });
@@ -189,16 +171,13 @@ function getRays() {
 
 function renderMinimap(posx, posy, rays, scale=0.75) {
   let csize = cellsize * scale;
-
 	map.forEach((row, y) => {
 		row.forEach((cell, x) => {
 			ctx.fillStyle = cell ? colors.lightwall : colors.floor; 
 			ctx.fillRect(posx+(x*csize), posy+(y*csize), csize, csize);
 		})
 	});
-
-  player.show(posx, posy, scale);
-  
+  player.show(posx, posy, scale); 
   ctx.strokeStyle = colors.rays;
   rays.forEach((ray, r) => { 
     ctx.beginPath();
@@ -222,8 +201,7 @@ function renderScene(rays) {
     let distance = fixFishEye(ray.distance, ray.angle, player.angle);
     let wallheight = ((cellsize * 4.2) / distance) * 250;
     ctx.fillStyle = ray.vertical ? colors.lightwall : colors.darkwall;
-    ctx.fillRect(r, (scheight - wallheight)/2, 1, wallheight);
-    
+    ctx.fillRect(r, (scheight - wallheight)/2, 1, wallheight); 
     ctx.fillStyle = colors.floor;
     ctx.fillRect(
       r, 
@@ -231,7 +209,6 @@ function renderScene(rays) {
       1, 
       (scheight - wallheight)/2
     );
-
     ctx.fillStyle = colors.ceiling;
     ctx.fillRect(r, 0, 1, (scheight - wallheight)/2);
   });
@@ -254,10 +231,10 @@ canvas.addEventListener("click", () => {
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "ArrowUp") {
-    player.speed = 2;
+    player.speed = 3;
   }
   if (e.key === "ArrowDown") {
-    player.speed = -2;
+    player.speed = -3;
   }
 });
 
